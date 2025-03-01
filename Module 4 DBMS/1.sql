@@ -21,3 +21,7 @@ INSERT INTO students (student_id, student_name, age, class, address) VALUES
 
 -- Retrieve all records using the SELECT statement
 SELECT * FROM students;
+
+-- Retrieve Students with Age > 10
+SELECT * FROM students WHERE age > 10;
+
