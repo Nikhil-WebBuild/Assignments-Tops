@@ -6,6 +6,7 @@ BEGIN
     SELECT COUNT(*) INTO emp_count FROM employees;
     DBMS_OUTPUT.PUT_LINE('Total Employees: ' || emp_count);
 END;
+/
 
 -- Lab 2: Calculate total sales from orders table
 DECLARE
@@ -14,6 +15,7 @@ BEGIN
     SELECT SUM(order_amount) INTO total_sales FROM orders;
     DBMS_OUTPUT.PUT_LINE('Total Sales: ' || total_sales);
 END;
+/
 
 -- 2. PL/SQL Control Structures
 -- Lab 1: Check employee department using IF-THEN
@@ -28,15 +30,15 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('Employee is in ' || emp_dept || ' department');
     END IF;
 END;
+/
 
 -- Lab 2: Display employee names using FOR LOOP
-DECLARE
-    emp_name employees.first_name%TYPE;
 BEGIN
     FOR emp_rec IN (SELECT first_name FROM employees) LOOP
         DBMS_OUTPUT.PUT_LINE('Employee Name: ' || emp_rec.first_name);
     END LOOP;
 END;
+/
 
 -- 3. SQL Cursors
 -- Lab 1: Explicit cursor to display employee details
@@ -52,6 +54,7 @@ BEGIN
     END LOOP;
     CLOSE emp_cursor;
 END;
+/
 
 -- Lab 2: Cursor to retrieve all courses
 DECLARE
@@ -66,42 +69,41 @@ BEGIN
     END LOOP;
     CLOSE course_cursor;
 END;
+/
 
 -- 4. Rollback and Commit Savepoint
 -- Lab 1: Savepoint and rollback example
 BEGIN
-    INSERT INTO employees (employee_id, first_name, salary) VALUES (201, 'John', 50000);
+    INSERT INTO employees (employee_id, first_name, salary) VALUES (201, 'Nikhil', 50000);
     SAVEPOINT save1;
 
-    INSERT INTO employees (employee_id, first_name, salary) VALUES (202, 'Mike', 60000);
+    INSERT INTO employees (employee_id, first_name, salary) VALUES (202, 'Ashish', 60000);
     ROLLBACK TO save1; -- Rollback only second insert
 
     COMMIT;
 END;
+/
 
 -- Lab 2: Commit part, rollback remaining
 BEGIN
-    INSERT INTO employees (employee_id, first_name, salary) VALUES (203, 'Anna', 70000);
+    INSERT INTO employees (employee_id, first_name, salary) VALUES (203, 'Kanishk', 70000);
     SAVEPOINT save2;
 
-    INSERT INTO employees (employee_id, first_name, salary) VALUES (204, 'Lisa', 80000);
+    INSERT INTO employees (employee_id, first_name, salary) VALUES (204, 'Himanshi', 80000);
     COMMIT;
 
-    INSERT INTO employees (employee_id, first_name, salary) VALUES (205, 'Paul', 90000);
+    INSERT INTO employees (employee_id, first_name, salary) VALUES (205, 'Roney', 90000);
     ROLLBACK TO save2;
 END;
+/
 
 -- 5. Introduction to SQL
 -- Lab 3: Create library_db & books table
-CREATE DATABASE library_db;
-
-USE library_db;
-
 CREATE TABLE books (
     book_id INT PRIMARY KEY,
-    title VARCHAR(100),
-    author VARCHAR(100),
-    publisher VARCHAR(100),
+    title VARCHAR2(100),
+    author VARCHAR2(100),
+    publisher VARCHAR2(100),
     year_of_publication INT,
     price DECIMAL(10,2)
 );
@@ -116,17 +118,17 @@ INSERT INTO books VALUES
 -- Lab 4: Create members table
 CREATE TABLE members (
     member_id INT PRIMARY KEY,
-    member_name VARCHAR(100),
+    member_name VARCHAR2(100),
     date_of_membership DATE,
-    email VARCHAR(100)
+    email VARCHAR2(100)
 );
 
 INSERT INTO members VALUES
-(1, 'Alice', TO_DATE('2021-05-10', 'YYYY-MM-DD'), 'alice@example.com'),
-(2, 'Bob', TO_DATE('2019-04-15', 'YYYY-MM-DD'), 'bob@example.com'),
-(3, 'Charlie', TO_DATE('2022-06-20', 'YYYY-MM-DD'), 'charlie@example.com'),
-(4, 'David', TO_DATE('2020-03-25', 'YYYY-MM-DD'), 'david@example.com'),
-(5, 'Eve', TO_DATE('2018-12-30', 'YYYY-MM-DD'), 'eve@example.com');
+(1, 'Nikhil', TO_DATE('2021-05-10', 'YYYY-MM-DD'), 'nikhil@example.com'),
+(2, 'Ashish', TO_DATE('2019-04-15', 'YYYY-MM-DD'), 'ashish@example.com'),
+(3, 'Kanishk', TO_DATE('2022-06-20', 'YYYY-MM-DD'), 'kanishk@example.com'),
+(4, 'Vikram', TO_DATE('2020-03-25', 'YYYY-MM-DD'), 'vikram@example.com'),
+(5, 'Roney', TO_DATE('2018-12-30', 'YYYY-MM-DD'), 'roney@example.com');
 
 -- 6. PL/SQL Stored Procedure Example
 -- Lab 3: Procedure to get books by author
@@ -136,17 +138,20 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('Book: ' || book.title);
     END LOOP;
 END;
+/
 
 -- To call:
 BEGIN
     get_books_by_author('Author A');
 END;
+/
 
 -- Lab 4: Procedure to get book price by id
 CREATE OR REPLACE PROCEDURE get_book_price(p_book_id INT, p_price OUT NUMBER) AS
 BEGIN
     SELECT price INTO p_price FROM books WHERE book_id = p_book_id;
 END;
+/
 
 -- To call:
 DECLARE
@@ -155,11 +160,12 @@ BEGIN
     get_book_price(1, v_price);
     DBMS_OUTPUT.PUT_LINE('Price: ' || v_price);
 END;
-
+/
 
 -- 7. PL/SQL Triggers Example
 -- Lab 3: Trigger to update last_modified
 ALTER TABLE books ADD last_modified DATE;
+/
 
 CREATE OR REPLACE TRIGGER update_book_timestamp
 BEFORE UPDATE ON books
@@ -167,6 +173,7 @@ FOR EACH ROW
 BEGIN
     :NEW.last_modified := SYSDATE;
 END;
+/
 
 -- Lab 4: Trigger to log DELETE operation
 CREATE TABLE log_changes (
@@ -175,6 +182,10 @@ CREATE TABLE log_changes (
     table_name VARCHAR2(50),
     log_time DATE
 );
+/
+
+CREATE SEQUENCE log_changes_seq START WITH 1 INCREMENT BY 1;
+/
 
 CREATE OR REPLACE TRIGGER log_book_delete
 AFTER DELETE ON books
@@ -183,3 +194,4 @@ BEGIN
     INSERT INTO log_changes (log_id, operation, table_name, log_time)
     VALUES (log_changes_seq.NEXTVAL, 'DELETE', 'books', SYSDATE);
 END;
+/
